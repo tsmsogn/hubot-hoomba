@@ -27,4 +27,12 @@ Run `npm install`
 ```
 user1>> hubot user1 can do cleaning task
 hubot>> OK, user1 can do the 'cleaning' task.
+user1>> hubot what tasks can user1 do?
+hubot>> user1 can do the following tasks: cleaning.
+user1>> hubot user2 can do cleaning task
+hubot>> OK, user2 can do the 'cleaning' task.
+user1>> hubot who can do cleaning task?
+hubot>> The following people can do the 'cleaning' task: user1, user2
+user1>> assign cleaning task to a user
+hubot>> The following people is assigned to the 'cleaning' task: user1
 ```
