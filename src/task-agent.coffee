@@ -132,13 +132,17 @@ module.exports = (robot) ->
       msg.reply "There are no people that can do the '#{task}' task."
 
   robot.respond /assign (["'\w: -_]+) task to (a|\d+) users?$/i, (msg) ->
-    task = msg.match[1].toLowerCase()
-    numberOfUser = msg.match[2]
-    if numberOfUser.toLowerCase() is 'a' then numberOfUser = 1
-    userNames = robot.task_agent.usersWithTask(task) if task?
-
-    if userNames.length > 0
-      electedUserName = robot.task_agent.select(userNames, numberOfUser)
-      msg.reply "The following people is assigned to the '#{task}' task: #{electedUserName.join(', ')}"
+    unless robot.task_agent.isAdmin msg.message.user
+      msg.reply "Sorry, only admins can assign tasks."
     else
-      msg.reply "There are no people that can do the '#{task}' task."
+
+      task = msg.match[1].toLowerCase()
+      numberOfUser = msg.match[2]
+      if numberOfUser.toLowerCase() is 'a' then numberOfUser = 1
+      userNames = robot.task_agent.usersWithTask(task) if task?
+  
+      if userNames.length > 0
+        electedUserName = robot.task_agent.select(userNames, numberOfUser)
+        msg.reply "The following people is assigned to the '#{task}' task: #{electedUserName.join(', ')}"
+      else
+        msg.reply "There are no people that can do the '#{task}' task."
