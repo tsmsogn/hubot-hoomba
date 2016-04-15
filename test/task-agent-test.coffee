@@ -49,10 +49,17 @@ describe 'task-agent', ->
 
   it 'anon user fails to set task', (done) ->
     adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /only admins can assign tasks/i
+      expect(strings[0]).to.match /only admins can set tasks to users/i
       done()
 
     adapter.receive(new TextMessage anon_user, "hubot: task-user can do demo task")
+
+  it 'anon user fails to remove task', (done) ->
+    adapter.on "reply", (envelope, strings) ->
+      expect(strings[0]).to.match /only admins can remove tasks from users/i
+      done()
+
+    adapter.receive(new TextMessage anon_user, "hubot: task-user can't do demo task")
 
   it 'anon user fails to assign task', (done) ->
     adapter.on "reply", (envelope, strings) ->
