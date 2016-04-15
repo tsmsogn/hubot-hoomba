@@ -72,7 +72,9 @@ describe 'task-agent', ->
     adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
 
     adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /can do the 'demo' task/i
+      if strings[0].match /OK, admin-user can do the .*demo/ then return
+
+      expect(strings[0]).to.match /can't do the 'demo' task/i
       done()
 
     adapter.receive(new TextMessage admin_user, "hubot: I can't do demo task")
@@ -81,8 +83,24 @@ describe 'task-agent', ->
     adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
 
     adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match(/following tasks: .*admin/)
-      expect(strings[0]).to.match(/following tasks: .*demo/)
+      if strings[0].match /OK, admin-user can do the .*demo/ then return
+
+      expect(strings[0]).to.match /following tasks: .*demo/i
       done()
 
     adapter.receive(new TextMessage anon_user, "hubot: what tasks can admin-user do?")
+
+  it 'successfully assign task to users', (done) ->
+    adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
+    adapter.receive(new TextMessage admin_user, "hubot: task-user can do demo task")
+
+    adapter.on "reply", (envelope, strings) ->
+      if strings[0].match /OK, admin-user can do the .*demo/ then return
+      if strings[0].match /OK, task-user can do the .*demo/ then return
+
+      expect(strings[0]).to.match /following people is assigned/i
+      expect(strings[0]).to.match /admin-user/i
+      expect(strings[0]).to.match /task-user/i
+      done()
+
+    adapter.receive(new TextMessage anon_user, "hubot: assign demo task to 2 users")
