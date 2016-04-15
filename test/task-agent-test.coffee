@@ -72,7 +72,9 @@ describe 'task-agent', ->
     adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
 
     adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /can do the 'demo' task/i
+      if strings[0].match /OK, admin-user can do the .*demo/ then return
+
+      expect(strings[0]).to.match /can't do the 'demo' task/i
       done()
 
     adapter.receive(new TextMessage admin_user, "hubot: I can't do demo task")
@@ -81,7 +83,8 @@ describe 'task-agent', ->
     adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
 
     adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match(/following tasks: .*admin/)
+      if strings[0].match /OK, admin-user can do the .*demo/ then return
+
       expect(strings[0]).to.match(/following tasks: .*demo/)
       done()
 
