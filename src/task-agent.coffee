@@ -76,7 +76,7 @@ module.exports = (robot) ->
 
   robot.respond /@?(.+) can do (["'\w: -_]+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
-      msg.reply "Sorry, only admins can assign tasks."
+      msg.reply "Sorry, only admins can set tasks to users"
     else
       name = msg.match[1].trim()
       if name.toLowerCase() is 'i' then name = msg.message.user.name
@@ -96,7 +96,7 @@ module.exports = (robot) ->
 
   robot.respond /@?(.+) can(['’]t| ?not) do (["'\w: -_]+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
-      msg.reply "Sorry, only admins can remove tasks."
+      msg.reply "Sorry, only admins can remove tasks from users."
     else
       name = msg.match[1].trim()
       if name.toLowerCase() is 'i' then name = msg.message.user.name
