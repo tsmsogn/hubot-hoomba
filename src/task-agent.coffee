@@ -74,7 +74,7 @@ module.exports = (robot) ->
 
   robot.task_agent = new TaskAgent
 
-  robot.respond /@?(.+) can do (["'\w: -_]+) task/i, (msg) ->
+  robot.respond /@?(.+) can do (.+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can set tasks to users"
     else
@@ -94,7 +94,7 @@ module.exports = (robot) ->
           user.tasks.push(newTask)
           msg.reply "OK, #{name} can do the '#{newTask}' task."
 
-  robot.respond /@?(.+) can(['’]t| ?not) do (["'\w: -_]+) task/i, (msg) ->
+  robot.respond /@?(.+) can(['’]t| ?not) do (.+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can remove tasks from users."
     else
@@ -122,7 +122,7 @@ module.exports = (robot) ->
     else
       msg.reply "#{name} can do the following tasks: #{userTasks.join(', ')}."
 
-  robot.respond /who can do (["'\w: -_]+) task\?*$/i, (msg) ->
+  robot.respond /who can do (.+) task\?*$/i, (msg) ->
     task = msg.match[1].toLowerCase()
     userNames = robot.task_agent.usersWithTask(task) if task?
 
@@ -131,7 +131,7 @@ module.exports = (robot) ->
     else
       msg.reply "There are no people that can do the '#{task}' task."
 
-  robot.respond /assign (["'\w: -_]+) task to (a|\d+) users?$/i, (msg) ->
+  robot.respond /assign (.+) task to (a|\d+) users?$/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can assign tasks."
     else
