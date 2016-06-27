@@ -11,6 +11,7 @@
 #   hubot what tasks can I do - Find out what tasks you can do
 #   hubot who can do <task> task - Find out who can do the given task
 #   hubot assign <task> task to a user - Assings a task to a user in random
+#   hubot list tasks - List all tasks
 #
 # Notes:
 #   * Call the method: robot.task_agent.canDoTask(msg.envelope.user,'<task>')
@@ -74,7 +75,7 @@ module.exports = (robot) ->
 
   robot.task_agent = new TaskAgent
 
-  robot.respond /@?(.+) can do (["'\w: -_]+) task/i, (msg) ->
+  robot.respond /@?(.+) can do (.+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can set tasks to users"
     else
@@ -94,7 +95,7 @@ module.exports = (robot) ->
           user.tasks.push(newTask)
           msg.reply "OK, #{name} can do the '#{newTask}' task."
 
-  robot.respond /@?(.+) can(['’]t| ?not) do (["'\w: -_]+) task/i, (msg) ->
+  robot.respond /@?(.+) can(['’]t| ?not) do (.+) task/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can remove tasks from users."
     else
@@ -122,7 +123,7 @@ module.exports = (robot) ->
     else
       msg.reply "#{name} can do the following tasks: #{userTasks.join(', ')}."
 
-  robot.respond /who can do (["'\w: -_]+) task\?*$/i, (msg) ->
+  robot.respond /who can do (.+) task\?*$/i, (msg) ->
     task = msg.match[1].toLowerCase()
     userNames = robot.task_agent.usersWithTask(task) if task?
 
@@ -131,7 +132,7 @@ module.exports = (robot) ->
     else
       msg.reply "There are no people that can do the '#{task}' task."
 
-  robot.respond /assign (["'\w: -_]+) task to (a|\d+) users?$/i, (msg) ->
+  robot.respond /assign (.+) task to (a|\d+) users?$/i, (msg) ->
     unless robot.task_agent.isAdmin msg.message.user
       msg.reply "Sorry, only admins can assign tasks."
     else
@@ -146,3 +147,13 @@ module.exports = (robot) ->
         msg.reply "The following people is assigned to the '#{task}' task: #{electedUserName.join(', ')}"
       else
         msg.reply "There are no people that can do the '#{task}' task."
+
+  robot.respond /list tasks/i, (msg) ->
+    tasks = []
+    for key, user of robot.brain.data.users
+      tasks.push task for task in robot.task_agent.userTasks(user) when task not in tasks
+
+    if tasks.length > 0
+      msg.reply "The following tasks are exists: #{tasks.join(', ')}"
+    else
+      msg.reply "No tasks to list."

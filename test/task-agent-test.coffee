@@ -47,74 +47,91 @@ describe 'task-agent', ->
   afterEach ->
     robot.shutdown()
 
-  it 'anon user fails to set task', (done) ->
-    adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /only admins can set tasks to users/i
-      done()
+  describe 'anon user', ->
 
-    adapter.receive(new TextMessage anon_user, "hubot: task-user can do demo task")
+    it 'fails to set task', (done) ->
+      adapter.on "reply", (envelope, strings) ->
+        expect(strings[0]).to.match /only admins can set tasks to users/i
+        done()
 
-  it 'anon user fails to remove task', (done) ->
-    adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /only admins can remove tasks from users/i
-      done()
+      adapter.receive(new TextMessage anon_user, "hubot: task-user can do デモ task")
 
-    adapter.receive(new TextMessage anon_user, "hubot: task-user can't do demo task")
+    it 'fails to remove task', (done) ->
+      adapter.on "reply", (envelope, strings) ->
+        expect(strings[0]).to.match /only admins can remove tasks from users/i
+        done()
 
-  it 'anon user fails to assign task', (done) ->
-    adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /only admins can assign tasks/i
-      done()
+      adapter.receive(new TextMessage anon_user, "hubot: task-user can't do デモ task")
 
-    adapter.receive(new TextMessage anon_user, "hubot: assign demo task to 2 users")
+    it 'fails to assign task', (done) ->
+      adapter.on "reply", (envelope, strings) ->
+        expect(strings[0]).to.match /only admins can assign tasks/i
+        done()
 
-  it 'admin user successfully sets task', (done) ->
-    adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /task-user can do the 'demo' task/i
-      done()
+      adapter.receive(new TextMessage anon_user, "hubot: assign デモ task to 2 users")
 
-    adapter.receive(new TextMessage admin_user, "hubot: task-user can do demo task")
+    it 'successfully list multiple tasks of admin user', (done) ->
+      adapter.receive(new TextMessage admin_user, "hubot: admin-user can do デモ task")
 
-  it 'admin user successfully sets task in the first-person', (done) ->
-    adapter.on "reply", (envelope, strings) ->
-      expect(strings[0]).to.match /admin-user can do the 'demo' task/i
-      done()
+      adapter.on "reply", (envelope, strings) ->
+        if strings[0].match /OK, admin-user can do the .*デモ/ then return
 
-    adapter.receive(new TextMessage admin_user, "hubot: I can do demo task")
+        expect(strings[0]).to.match /following tasks: .*デモ/i
+        done()
 
-  it 'admin user successfully removes task in the first-person', (done) ->
-    adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
+      adapter.receive(new TextMessage anon_user, "hubot: what tasks can admin-user do?")
 
-    adapter.on "reply", (envelope, strings) ->
-      if strings[0].match /OK, admin-user can do the .*demo/ then return
+    it 'successfully list tasks', (done) ->
+      adapter.receive(new TextMessage admin_user, "hubot: admin-user can do デモ1 task")
+      adapter.receive(new TextMessage admin_user, "hubot: task-user can do デモ2 task")
 
-      expect(strings[0]).to.match /can't do the 'demo' task/i
-      done()
+      adapter.on "reply", (envelope, strings) ->
+        if strings[0].match /OK, admin-user can do the .*デモ/ then return
+        if strings[0].match /OK, task-user can do the .*デモ/ then return
 
-    adapter.receive(new TextMessage admin_user, "hubot: I can't do demo task")
+        expect(strings[0]).to.match /following tasks are exists: デモ1, デモ2/i
+        done()
 
-  it 'successfully list multiple tasks of admin user', (done) ->
-    adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
+      adapter.receive(new TextMessage anon_user, "hubot: list tasks")
 
-    adapter.on "reply", (envelope, strings) ->
-      if strings[0].match /OK, admin-user can do the .*demo/ then return
+  describe 'admin user', ->
 
-      expect(strings[0]).to.match /following tasks: .*demo/i
-      done()
+    it 'successfully sets task', (done) ->
+      adapter.on "reply", (envelope, strings) ->
+        expect(strings[0]).to.match /task-user can do the 'デモ' task/i
+        done()
 
-    adapter.receive(new TextMessage anon_user, "hubot: what tasks can admin-user do?")
+      adapter.receive(new TextMessage admin_user, "hubot: task-user can do デモ task")
 
-  it 'successfully assign task to users', (done) ->
-    adapter.receive(new TextMessage admin_user, "hubot: admin-user can do demo task")
-    adapter.receive(new TextMessage admin_user, "hubot: task-user can do demo task")
+    it 'successfully sets task in the first-person', (done) ->
+      adapter.on "reply", (envelope, strings) ->
+        expect(strings[0]).to.match /admin-user can do the 'デモ' task/i
+        done()
 
-    adapter.on "reply", (envelope, strings) ->
-      if strings[0].match /OK, admin-user can do the .*demo/ then return
-      if strings[0].match /OK, task-user can do the .*demo/ then return
+      adapter.receive(new TextMessage admin_user, "hubot: I can do デモ task")
 
-      expect(strings[0]).to.match /following people is assigned/i
-      expect(strings[0]).to.match /admin-user/i
-      expect(strings[0]).to.match /task-user/i
-      done()
+    it 'successfully removes task in the first-person', (done) ->
+      adapter.receive(new TextMessage admin_user, "hubot: admin-user can do デモ task")
 
-    adapter.receive(new TextMessage admin_user, "hubot: assign demo task to 2 users")
+      adapter.on "reply", (envelope, strings) ->
+        if strings[0].match /OK, admin-user can do the .*デモ/ then return
+
+        expect(strings[0]).to.match /can't do the 'デモ' task/i
+        done()
+
+      adapter.receive(new TextMessage admin_user, "hubot: I can't do デモ task")
+
+    it 'successfully assign task to users', (done) ->
+      adapter.receive(new TextMessage admin_user, "hubot: admin-user can do デモ task")
+      adapter.receive(new TextMessage admin_user, "hubot: task-user can do デモ task")
+
+      adapter.on "reply", (envelope, strings) ->
+        if strings[0].match /OK, admin-user can do the .*デモ/ then return
+        if strings[0].match /OK, task-user can do the .*デモ/ then return
+
+        expect(strings[0]).to.match /following people is assigned/i
+        expect(strings[0]).to.match /admin-user/i
+        expect(strings[0]).to.match /task-user/i
+        done()
+
+      adapter.receive(new TextMessage admin_user, "hubot: assign デモ task to 2 users")
