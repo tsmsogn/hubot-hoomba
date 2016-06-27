@@ -154,6 +154,6 @@ module.exports = (robot) ->
       tasks.push task for task in robot.task_agent.userTasks(user) when task not in tasks
 
     if tasks.length > 0
-      msg.reply "The following tasks are exists: #{tasks.join(', ')}"
+      msg.reply "The following tasks are available: #{tasks.join(', ')}"
     else
       msg.reply "No tasks to list."

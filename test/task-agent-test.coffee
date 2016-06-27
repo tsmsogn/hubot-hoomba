@@ -89,7 +89,7 @@ describe 'task-agent', ->
         if strings[0].match /OK, admin-user can do the .*デモ/ then return
         if strings[0].match /OK, task-user can do the .*デモ/ then return
 
-        expect(strings[0]).to.match /following tasks are exists: デモ1, デモ2/i
+        expect(strings[0]).to.match /following tasks are available: デモ1, デモ2/i
         done()
 
       adapter.receive(new TextMessage anon_user, "hubot: list tasks")
