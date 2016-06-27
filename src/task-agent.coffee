@@ -11,6 +11,7 @@
 #   hubot what tasks can I do - Find out what tasks you can do
 #   hubot who can do <task> task - Find out who can do the given task
 #   hubot assign <task> task to a user - Assings a task to a user in random
+#   hubot list tasks - List all tasks
 #
 # Notes:
 #   * Call the method: robot.task_agent.canDoTask(msg.envelope.user,'<task>')
@@ -146,3 +147,13 @@ module.exports = (robot) ->
         msg.reply "The following people is assigned to the '#{task}' task: #{electedUserName.join(', ')}"
       else
         msg.reply "There are no people that can do the '#{task}' task."
+
+  robot.respond /list tasks/i, (msg) ->
+    tasks = []
+    for key, user of robot.brain.data.users
+      tasks.push task for task in robot.task_agent.userTasks(user) when task not in tasks
+
+    if tasks.length > 0
+      msg.reply "The following tasks are exists: #{tasks.join(', ')}"
+    else
+      msg.reply "No tasks to list."

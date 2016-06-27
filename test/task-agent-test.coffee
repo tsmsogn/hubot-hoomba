@@ -81,6 +81,19 @@ describe 'task-agent', ->
 
       adapter.receive(new TextMessage anon_user, "hubot: what tasks can admin-user do?")
 
+    it 'successfully list tasks', (done) ->
+      adapter.receive(new TextMessage admin_user, "hubot: admin-user can do デモ1 task")
+      adapter.receive(new TextMessage admin_user, "hubot: task-user can do デモ2 task")
+
+      adapter.on "reply", (envelope, strings) ->
+        if strings[0].match /OK, admin-user can do the .*デモ/ then return
+        if strings[0].match /OK, task-user can do the .*デモ/ then return
+
+        expect(strings[0]).to.match /following tasks are exists: デモ1, デモ2/i
+        done()
+
+      adapter.receive(new TextMessage anon_user, "hubot: list tasks")
+
   describe 'admin user', ->
 
     it 'successfully sets task', (done) ->
