@@ -1,7 +1,7 @@
 {
   "name": "hubot-task-agent",
   "description": "Assign tasks to users in random",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Alex Williams (http://github.com/aw)",
   "contributors": [
     "technicalpickles",
